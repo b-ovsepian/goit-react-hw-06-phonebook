@@ -82,7 +82,7 @@ const Li = transition.li.attrs({
   }
 `;
 
-const Contacts = ({ contacts, onDeleteContact, filter, onChangeFilter }) => {
+const Contacts = ({ contacts, filter, onChangeFilter }) => {
   return (
     <ContactsDiv>
       <Label>
@@ -95,13 +95,9 @@ const Contacts = ({ contacts, onDeleteContact, filter, onChangeFilter }) => {
         />
       </Label>
       <TransitionGroup component={Ul}>
-        {contacts.map((contact, index) => (
+        {contacts.map((contact) => (
           <Li key={contact.id}>
-            <ContactItem
-              {...contact}
-              index={index}
-              OnDeleteContact={() => onDeleteContact(contact.id)}
-            />
+            <ContactItem id={contact.id} />
           </Li>
         ))}
       </TransitionGroup>
@@ -123,7 +119,6 @@ const mapStateToProps = (state) => {
 };
 
 const mapDispatchToProps = {
-  onDeleteContact: contactsActios.deleteContact,
   onChangeFilter: contactsActios.changeFilter,
 };
 
@@ -131,7 +126,6 @@ export default connect(mapStateToProps, mapDispatchToProps)(Contacts);
 
 Contacts.propTypes = {
   contacts: PropTypes.array.isRequired,
-  onDeleteContact: PropTypes.func.isRequired,
   filter: PropTypes.string.isRequired,
   onChangeFilter: PropTypes.func.isRequired,
 };

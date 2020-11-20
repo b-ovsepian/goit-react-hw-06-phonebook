@@ -1,3 +1,4 @@
+import { createAction } from "@reduxjs/toolkit";
 import { v4 as uuidv4 } from "uuid";
 
 import {
@@ -7,29 +8,16 @@ import {
   CHANGE_ERROR,
 } from "../constants";
 
-const addContact = (name, number) => ({
-  type: ADD_CONTACT,
+const addContact = createAction(ADD_CONTACT, (name, number) => ({
   payload: {
     id: uuidv4(),
-    name: name,
-    number: number,
+    name,
+    number,
   },
-});
-
-const deleteContact = (idContact) => ({
-  type: DELETE_CONTACT,
-  payload: { idContact },
-});
-
-const changeFilter = (filter) => ({
-  type: CHANGE_FILTER,
-  payload: { filter },
-});
-
-const changeError = (error) => ({
-  type: CHANGE_ERROR,
-  payload: { error },
-});
+}));
+const deleteContact = createAction(DELETE_CONTACT);
+const changeFilter = createAction(CHANGE_FILTER);
+const changeError = createAction(CHANGE_ERROR);
 
 export default {
   addContact,

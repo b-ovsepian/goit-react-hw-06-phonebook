@@ -1,6 +1,8 @@
 import React from "react";
 import styled from "styled-components";
 import PropTypes from "prop-types";
+import { connect } from "react-redux";
+import contactsAction from "../../redux/actions/contactsAction";
 
 const P = styled.p`
   display: block;
@@ -50,7 +52,7 @@ const ContactItem = ({ id, name, number, OnDeleteContact }) => {
       </P>
       <Button
         type="button"
-        onClick={(e) => {
+        onClick={() => {
           OnDeleteContact(id);
         }}
       >
@@ -60,11 +62,20 @@ const ContactItem = ({ id, name, number, OnDeleteContact }) => {
   );
 };
 
-export default ContactItem;
+const mapStateToProps = (state, ownProps) => {
+  const item = state.contacts.items.find(
+    (contact) => contact.id === ownProps.id
+  );
+  return { ...item };
+};
+
+const mapDispatchToProps = (dispatch, ownProps) => ({
+  OnDeleteContact: () => dispatch(contactsAction.deleteContact(ownProps.id)),
+});
+
+export default connect(mapStateToProps, mapDispatchToProps)(ContactItem);
 
 ContactItem.propTypes = {
   id: PropTypes.string.isRequired,
-  name: PropTypes.string.isRequired,
-  number: PropTypes.string.isRequired,
   OnDeleteContact: PropTypes.func.isRequired,
 };

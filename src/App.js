@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from "react";
+import React, { useEffect } from "react";
 import { connect } from "react-redux";
 import contactsAction from "./redux/actions/contactsAction";
 import Section from "./Components/Section/Section";

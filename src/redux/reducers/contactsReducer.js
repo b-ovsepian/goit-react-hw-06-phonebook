@@ -1,4 +1,6 @@
 import { combineReducers } from "redux";
+import { createReducer } from "@reduxjs/toolkit";
+
 import {
   ADD_CONTACT,
   DELETE_CONTACT,
@@ -6,37 +8,19 @@ import {
   CHANGE_ERROR,
 } from "../constants";
 
-const items = (state = [], { type, payload }) => {
-  switch (type) {
-    case ADD_CONTACT:
-      return [...state, payload];
+const items = createReducer([], {
+  [ADD_CONTACT]: (state, { payload }) => [...state, payload],
+  [DELETE_CONTACT]: (state, { payload }) =>
+    state.filter((contact) => contact.id !== payload),
+});
 
-    case DELETE_CONTACT:
-      return state.filter((contact) => contact.id !== payload.idContact);
+const filter = createReducer("", {
+  [CHANGE_FILTER]: (state, { payload }) => payload,
+});
 
-    default:
-      return state;
-  }
-};
-const filter = (state = "", { type, payload }) => {
-  switch (type) {
-    case CHANGE_FILTER:
-      return payload.filter;
-
-    default:
-      return state;
-  }
-};
-
-const error = (state = "", { type, payload }) => {
-  switch (type) {
-    case CHANGE_ERROR:
-      return payload.error;
-
-    default:
-      return state;
-  }
-};
+const error = createReducer("", {
+  [CHANGE_ERROR]: (state, { payload }) => payload,
+});
 
 export default combineReducers({
   items,
