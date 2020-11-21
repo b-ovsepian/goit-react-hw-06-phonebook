@@ -1,7 +1,7 @@
 import React, { useState } from "react";
-import { connect } from "react-redux";
-import contactsAction from "../../redux/actions/contactsAction";
-import PropTypes from "prop-types";
+import { useSelector, useDispatch } from "react-redux";
+import { addContact } from "../../redux/slice/contactsSlice";
+import { errorChange } from "../../redux/slice/errorSlice";
 import styled from "styled-components";
 
 const Form = styled.form`
@@ -84,7 +84,9 @@ const formInitialState = {
   number: "",
 };
 
-const ContactForm = ({ contacts, onAddContact, onAddError }) => {
+const ContactForm = () => {
+  const contacts = useSelector((state) => state.contacts.items);
+  const dispatch = useDispatch();
   const [{ name, number }, setForm] = useState({ ...formInitialState });
 
   const handlerInputChange = (e) => {
@@ -98,9 +100,9 @@ const ContactForm = ({ contacts, onAddContact, onAddError }) => {
       return;
     }
     if (contacts.every((contact) => !contact.name.includes(name))) {
-      onAddContact(name, number);
+      dispatch(addContact(name, number));
     } else {
-      onAddError(`${name} is already in contacts!`);
+      dispatch(errorChange(`${name} is already in contacts!`));
     }
     setForm({ ...formInitialState });
   };
@@ -130,19 +132,4 @@ const ContactForm = ({ contacts, onAddContact, onAddError }) => {
   );
 };
 
-const mapStateToProps = (state) => ({
-  contacts: state.contacts.items,
-});
-
-const mapDispatchToProps = {
-  onAddContact: contactsAction.addContact,
-  onAddError: contactsAction.changeError,
-};
-
-export default connect(mapStateToProps, mapDispatchToProps)(ContactForm);
-
-ContactForm.propTypes = {
-  contacts: PropTypes.array.isRequired,
-  onAddContact: PropTypes.func.isRequired,
-  onAddError: PropTypes.func.isRequired,
-};
+export default ContactForm;

@@ -1,8 +1,7 @@
 import React from "react";
 import styled from "styled-components";
-import PropTypes from "prop-types";
-import { connect } from "react-redux";
-import contactsAction from "../../redux/actions/contactsAction";
+import { useSelector, useDispatch } from "react-redux";
+import { deleteContact } from "../../redux/slice/contactsSlice";
 
 const P = styled.p`
   display: block;
@@ -44,38 +43,23 @@ const Button = styled.button`
   }
 `;
 
-const ContactItem = ({ id, name, number, OnDeleteContact }) => {
+const ContactItem = ({ id }) => {
+  const contact = useSelector((state) =>
+    state.contacts.items.find((contact) => contact.id === id)
+  );
+  const dispatch = useDispatch();
+
   return (
     <>
-      <P>
-        {name}: {number}
-      </P>
-      <Button
-        type="button"
-        onClick={() => {
-          OnDeleteContact(id);
-        }}
-      >
+      {contact && (
+        <P>
+          {contact.name}: {contact.number}
+        </P>
+      )}
+      <Button type="button" onClick={() => dispatch(deleteContact(id))}>
         x
       </Button>
     </>
   );
 };
-
-const mapStateToProps = (state, ownProps) => {
-  const item = state.contacts.items.find(
-    (contact) => contact.id === ownProps.id
-  );
-  return { ...item };
-};
-
-const mapDispatchToProps = (dispatch, ownProps) => ({
-  OnDeleteContact: () => dispatch(contactsAction.deleteContact(ownProps.id)),
-});
-
-export default connect(mapStateToProps, mapDispatchToProps)(ContactItem);
-
-ContactItem.propTypes = {
-  id: PropTypes.string.isRequired,
-  OnDeleteContact: PropTypes.func.isRequired,
-};
+export default ContactItem;

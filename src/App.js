@@ -1,11 +1,12 @@
 import React, { useEffect } from "react";
-import { connect } from "react-redux";
-import contactsAction from "./redux/actions/contactsAction";
+import { useSelector, useDispatch } from "react-redux";
+import { addContact } from "./redux/slice/contactsSlice";
+import { errorChange } from "./redux/slice/errorSlice";
+
 import Section from "./Components/Section/Section";
 import ContactForm from "./Components/ContactForm/ContactForm";
 import Contacts from "./Components/Contacts/Contacts";
 import transition from "styled-transition-group";
-import PropTypes from "prop-types";
 
 const Div = transition.div.attrs({
   unmountOnExit: true,
@@ -41,14 +42,18 @@ color: white;
   }
 `;
 
-const App = ({ contacts, onAddContacts, error, onChangeError }) => {
+const App = () => {
+  const contacts = useSelector((state) => state.contacts.items);
+  const error = useSelector((state) => state.contacts.error);
+  const dispatch = useDispatch();
+
   useEffect(() => {
     const persistedContacts = localStorage.getItem("contacts");
     if (persistedContacts) {
       const contacts = JSON.parse(persistedContacts);
 
       contacts.forEach((contact) =>
-        onAddContacts(contact.name, contact.number)
+        dispatch(addContact(contact.name, contact.number))
       );
     }
   }, []);
@@ -60,7 +65,7 @@ const App = ({ contacts, onAddContacts, error, onChangeError }) => {
   useEffect(() => {
     if (error) {
       setTimeout(() => {
-        onChangeError("");
+        dispatch(errorChange(""));
       }, 1500);
     }
   }, [error]);
@@ -82,21 +87,4 @@ const App = ({ contacts, onAddContacts, error, onChangeError }) => {
   );
 };
 
-const mapStateToProps = (state) => ({
-  contacts: state.contacts.items,
-  error: state.contacts.error,
-});
-
-const mapDispatchToProps = {
-  onAddContacts: contactsAction.addContact,
-  onChangeError: contactsAction.changeError,
-};
-
-export default connect(mapStateToProps, mapDispatchToProps)(App);
-
-App.propTypes = {
-  contacts: PropTypes.array.isRequired,
-  onAddContacts: PropTypes.func.isRequired,
-  error: PropTypes.string.isRequired,
-  onChangeError: PropTypes.func.isRequired,
-};
+export default App;

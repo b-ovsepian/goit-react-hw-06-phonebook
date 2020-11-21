@@ -1,8 +1,7 @@
 import React from "react";
-import { connect } from "react-redux";
-import contactsActios from "../../redux/actions/contactsAction";
+import { useSelector, useDispatch } from "react-redux";
+import { changeFilter } from "../../redux/slice/filterSlice";
 import ContactItem from "../ContactItem/ContactItem";
-import PropTypes from "prop-types";
 import styled from "styled-components";
 import { TransitionGroup } from "react-transition-group";
 import transition from "styled-transition-group";
@@ -18,7 +17,6 @@ const ContactsDiv = styled.div`
   border: 2px solid #212121;
   border-radius: 10px;
 `;
-
 const Label = styled.label`
   display: block;
   margin-top: 0;
@@ -46,7 +44,6 @@ const Ul = styled.ul`
   padding: 0;
   list-style: none;
 `;
-
 const Li = transition.li.attrs({
   unmountOnExit: true,
   mountOnEntry: true,
@@ -82,7 +79,16 @@ const Li = transition.li.attrs({
   }
 `;
 
-const Contacts = ({ contacts, filter, onChangeFilter }) => {
+const Contacts = () => {
+  const contacts = useSelector((state) => state.contacts.items);
+  const filter = useSelector((state) => state.contacts.filter);
+  const dispatch = useDispatch();
+
+  const normalizedFilter = filter.toLowerCase();
+  const visibleContacts = contacts.filter((contact) =>
+    contact.name.toLowerCase().includes(normalizedFilter)
+  );
+
   return (
     <ContactsDiv>
       <Label>
@@ -91,11 +97,11 @@ const Contacts = ({ contacts, filter, onChangeFilter }) => {
           type="text"
           name="search"
           value={filter}
-          onChange={(e) => onChangeFilter(e.target.value)}
+          onChange={(e) => dispatch(changeFilter(e.target.value))}
         />
       </Label>
       <TransitionGroup component={Ul}>
-        {contacts.map((contact) => (
+        {visibleContacts.map((contact) => (
           <Li key={contact.id}>
             <ContactItem id={contact.id} />
           </Li>
@@ -105,27 +111,4 @@ const Contacts = ({ contacts, filter, onChangeFilter }) => {
   );
 };
 
-const mapStateToProps = (state) => {
-  const { items, filter } = state.contacts;
-  const normalizedFilter = filter.toLowerCase();
-  const visibleContacts = items.filter((contact) =>
-    contact.name.toLowerCase().includes(normalizedFilter)
-  );
-
-  return {
-    contacts: visibleContacts,
-    filter: state.contacts.filter,
-  };
-};
-
-const mapDispatchToProps = {
-  onChangeFilter: contactsActios.changeFilter,
-};
-
-export default connect(mapStateToProps, mapDispatchToProps)(Contacts);
-
-Contacts.propTypes = {
-  contacts: PropTypes.array.isRequired,
-  filter: PropTypes.string.isRequired,
-  onChangeFilter: PropTypes.func.isRequired,
-};
+export default Contacts;
